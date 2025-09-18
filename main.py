@@ -140,8 +140,16 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.get("/")
 async def root():
-    """Redirect to frontend application."""
-    return RedirectResponse(url="/app")
+    """API root endpoint with basic information."""
+    return {
+        "message": "PersonalityAI API",
+        "version": config.app.version,
+        "status": "running",
+        "docs": "/docs",
+        "health": "/health",
+        "admin": "/admin",
+        "timestamp": time.time()
+    }
 
 
 @app.get("/health")
