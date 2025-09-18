@@ -763,10 +763,20 @@ if __name__ == "__main__":
     logger.info(f"Debug mode: {config.server.debug}")
     logger.info(f"Cache directory: {config.cache.cache_dir}")
     
-    uvicorn.run(
-        app,
-        host=config.server.host,
-        port=config.server.port,
-        log_level="debug" if config.server.debug else "info",
-        reload=config.server.debug and config.is_development
-    )
+    # Use import string for reload functionality, app object for production
+    if config.server.debug and config.is_development:
+        uvicorn.run(
+            "main:app",  # Use import string for reload
+            host=config.server.host,
+            port=config.server.port,
+            log_level="debug",
+            reload=True
+        )
+    else:
+        uvicorn.run(
+            app,  # Use app object for production
+            host=config.server.host,
+            port=config.server.port,
+            log_level="info",
+            reload=False
+        )

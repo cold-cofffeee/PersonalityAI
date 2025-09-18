@@ -17,6 +17,9 @@ pytest-cov==4.1.0
 # Development dependencies  
 requests==2.31.0
 
+# System monitoring
+psutil==5.9.8
+
 # Optional: Redis for enhanced caching
 redis==5.0.1
 
