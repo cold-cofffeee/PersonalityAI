@@ -1019,21 +1019,30 @@
         }
 
         async function apiCall(endpoint, options = {}) {
-            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-                ...options,
-                headers: {
-                    'Authorization': `Bearer ${authToken}`,
-                    'Content-Type': 'application/json',
-                    ...options.headers
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`,
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    throw new Error('Authentication failed');
                 }
-            });
 
-            if (response.status === 401) {
-                logout();
-                throw new Error('Authentication failed');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
             }
-
-            return response.json();
         }
 
         async function loadDashboardData() {
@@ -1090,7 +1099,7 @@
                     users.forEach(user => {
                         tableHTML += `
                             <tr class="clickable-row" onclick="openUserModal('${user.fingerprint}')">
-                                <td><code>${user.fingerprint}</code></td>
+                                <td><code>${user.fingerprint_display || user.fingerprint}</code></td>
                                 <td><span class="badge badge-info">${user.request_count}</span></td>
                                 <td>${new Date(user.first_seen).toLocaleDateString()}</td>
                                 <td>${new Date(user.last_seen).toLocaleDateString()}</td>
@@ -1230,6 +1239,11 @@
 
         // Modal Functions
         function openUserModal(fingerprint) {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+            
             const modal = document.getElementById('userModal');
             const modalBody = document.getElementById('userModalBody');
             
@@ -1241,6 +1255,11 @@
         }
 
         function openCacheModal(cacheId) {
+            if (!authToken) {
+                alert('Please login first');
+                return;
+            }
+            
             const modal = document.getElementById('cacheModal');
             const modalBody = document.getElementById('cacheModalBody');
             
@@ -1257,33 +1276,43 @@
 
         async function loadUserDetails(fingerprint) {
             try {
+                console.log('Loading user details for fingerprint:', fingerprint);
+                console.log('Auth token:', authToken);
                 const data = await apiCall('/admin/user-details?fingerprint=' + encodeURIComponent(fingerprint));
+                console.log('User details response:', data);
                 const modalBody = document.getElementById('userModalBody');
                 
                 if (data.success) {
                     const user = data.user_details;
                     modalBody.innerHTML = generateUserDetailsHTML(user);
                 } else {
-                    modalBody.innerHTML = '<div class="loading">Error loading user details</div>';
+                    console.error('User details API returned error:', data);
+                    modalBody.innerHTML = '<div class="loading">Error loading user details: ' + (data.detail || 'Unknown error') + '</div>';
                 }
             } catch (error) {
-                document.getElementById('userModalBody').innerHTML = '<div class="loading">Error loading user details</div>';
+                console.error('Error loading user details:', error);
+                document.getElementById('userModalBody').innerHTML = '<div class="loading">Error loading user details: ' + error.message + '</div>';
             }
         }
 
         async function loadCacheDetails(cacheId) {
             try {
+                console.log('Loading cache details for ID:', cacheId);
+                console.log('Auth token:', authToken);
                 const data = await apiCall('/admin/cache-entry?id=' + encodeURIComponent(cacheId));
+                console.log('Cache details response:', data);
                 const modalBody = document.getElementById('cacheModalBody');
                 
                 if (data.success) {
                     const entry = data.cache_entry;
                     modalBody.innerHTML = generateCacheDetailsHTML(entry);
                 } else {
-                    modalBody.innerHTML = '<div class="loading">Error loading cache details</div>';
+                    console.error('Cache details API returned error:', data);
+                    modalBody.innerHTML = '<div class="loading">Error loading cache details: ' + (data.detail || 'Unknown error') + '</div>';
                 }
             } catch (error) {
-                document.getElementById('cacheModalBody').innerHTML = '<div class="loading">Error loading cache details</div>';
+                console.error('Error loading cache details:', error);
+                document.getElementById('cacheModalBody').innerHTML = '<div class="loading">Error loading cache details: ' + error.message + '</div>';
             }
         }
 

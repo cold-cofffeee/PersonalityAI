@@ -136,7 +136,8 @@ class AdminDataManager:
                 
                 # Top users by request count
                 top_users.append({
-                    "fingerprint": fingerprint[:12] + "...",
+                    "fingerprint": fingerprint,  # Keep full fingerprint for API calls
+                    "fingerprint_display": fingerprint[:12] + "...",  # Truncated for display
                     "request_count": user_data["request_count"],
                     "first_seen": user_data["first_seen"],
                     "last_seen": user_data["last_seen"],
