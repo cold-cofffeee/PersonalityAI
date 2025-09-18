@@ -1,0 +1,1518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PersonalityAI - Admin Panel</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --secondary-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-bg: #0f172a;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .login-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--border-color);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .login-header h1 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #5b6ef0;
+            transform: translateY(-1px);
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger-color);
+            color: #fca5a5;
+        }
+
+        /* Dashboard Styles */
+        .dashboard {
+            display: none;
+        }
+
+        .dashboard.active {
+            display: block;
+        }
+
+        .navbar {
+            background: var(--card-bg);
+            padding: 1rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 73px;
+            width: 250px;
+            height: calc(100vh - 73px);
+            background: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+            padding: 2rem 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+            border-right: 3px solid var(--primary-color);
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 2rem;
+            min-height: calc(100vh - 73px);
+        }
+
+        .content-header {
+            margin-bottom: 2rem;
+        }
+
+        .content-header h2 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .breadcrumb {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-trend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .trend-up {
+            color: var(--success-color);
+        }
+
+        .trend-down {
+            color: var(--danger-color);
+        }
+
+        /* Tables */
+        .data-table {
+            background: var(--card-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            padding: 0.5rem;
+            background: var(--dark-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-primary);
+            width: 250px;
+        }
+
+        .refresh-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background: var(--dark-bg);
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        /* Charts */
+        .chart-container {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Badges */
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger-color);
+        }
+
+        .badge-info {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-color);
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--danger-color);
+            color: white;
+        }
+
+        .modal-body {
+            padding: 1.5rem;
+        }
+
+        .detail-section {
+            margin-bottom: 2rem;
+        }
+
+        .detail-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detail-item {
+            background: var(--dark-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-color);
+        }
+
+        .detail-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .text-preview {
+            background: var(--dark-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary-color);
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 1rem;
+        }
+
+        .response-preview {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .personality-traits {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .trait-card {
+            background: var(--dark-bg);
+            padding: 1rem;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .trait-name {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            text-transform: capitalize;
+        }
+
+        .trait-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .clickable-row {
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .clickable-row:hover {
+            background: rgba(99, 102, 241, 0.1) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .navbar {
+                padding: 1rem;
+            }
+
+            .search-box {
+                width: 150px;
+            }
+        }
+
+        /* Hide content sections by default */
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1><i class="fas fa-shield-alt"></i> Admin Panel</h1>
+                <p>PersonalityAI Administration</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+            </form>
+            <div id="loginError" class="alert alert-danger" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="dashboard">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="navbar-brand">
+                <i class="fas fa-brain"></i> PersonalityAI Admin
+            </div>
+            <div class="navbar-nav">
+                <span id="currentUser">Admin</span>
+                <button class="btn btn-danger" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <ul class="sidebar-menu">
+                <li><a href="#overview" class="menu-link active" data-section="overview">
+                    <i class="fas fa-tachometer-alt"></i> Overview
+                </a></li>
+                <li><a href="#users" class="menu-link" data-section="users">
+                    <i class="fas fa-users"></i> Users
+                </a></li>
+                <li><a href="#cache" class="menu-link" data-section="cache">
+                    <i class="fas fa-database"></i> Cache
+                </a></li>
+                <li><a href="#errors" class="menu-link" data-section="errors">
+                    <i class="fas fa-exclamation-triangle"></i> Error Logs
+                </a></li>
+                <li><a href="#analytics" class="menu-link" data-section="analytics">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </a></li>
+                <li><a href="#settings" class="menu-link" data-section="settings">
+                    <i class="fas fa-cog"></i> Settings
+                </a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Overview Section -->
+            <div id="overview" class="content-section active">
+                <div class="content-header">
+                    <h2>Dashboard Overview</h2>
+                    <div class="breadcrumb">Home / Dashboard</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalUsers">0</div>
+                        <div class="stat-label">Total Users</div>
+                        <div class="stat-trend trend-up">
+                            <i class="fas fa-arrow-up"></i>
+                            <span id="userGrowth">0%</span> from last week
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="cacheHitRate">0%</div>
+                        <div class="stat-label">Cache Hit Rate</div>
+                        <div class="stat-trend trend-up">
+                            <i class="fas fa-bolt"></i>
+                            <span id="cacheEfficiency">Excellent</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalAnalyses">0</div>
+                        <div class="stat-label">Total Analyses</div>
+                        <div class="stat-trend trend-up">
+                            <i class="fas fa-brain"></i>
+                            <span id="analysisGrowth">0</span> today
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="errorCount">0</div>
+                        <div class="stat-label">Recent Errors</div>
+                        <div class="stat-trend" id="errorTrend">
+                            <i class="fas fa-check-circle"></i>
+                            <span>System healthy</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Usage Analytics</div>
+                        <p>Real-time system performance and usage metrics</p>
+                    </div>
+                    <div id="usageChart" style="height: 300px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                        <i class="fas fa-chart-line" style="font-size: 3rem; margin-right: 1rem;"></i>
+                        Usage analytics will be displayed here
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="users" class="content-section">
+                <div class="content-header">
+                    <h2>User Management</h2>
+                    <div class="breadcrumb">Home / Users</div>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <div class="table-title">Recent Users</div>
+                        <div class="table-controls">
+                            <input type="text" class="search-box" placeholder="Search users..." id="userSearch">
+                            <button class="refresh-btn" onclick="loadUsers()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div id="usersTableContainer">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading users...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cache Section -->
+            <div id="cache" class="content-section">
+                <div class="content-header">
+                    <h2>Cache Management</h2>
+                    <div class="breadcrumb">Home / Cache</div>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <div class="table-title">Cached Responses</div>
+                        <div class="table-controls">
+                            <input type="text" class="search-box" placeholder="Search cache..." id="cacheSearch">
+                            <button class="refresh-btn" onclick="loadCache()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                            <button class="btn btn-warning" onclick="cleanupCache()">
+                                <i class="fas fa-broom"></i> Cleanup
+                            </button>
+                        </div>
+                    </div>
+                    <div id="cacheTableContainer">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading cache data...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Errors Section -->
+            <div id="errors" class="content-section">
+                <div class="content-header">
+                    <h2>Error Logs</h2>
+                    <div class="breadcrumb">Home / Error Logs</div>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <div class="table-title">Recent Errors</div>
+                        <div class="table-controls">
+                            <input type="text" class="search-box" placeholder="Search errors..." id="errorSearch">
+                            <button class="refresh-btn" onclick="loadErrors()">
+                                <i class="fas fa-sync-alt"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div id="errorsTableContainer">
+                        <div class="loading">
+                            <div class="spinner"></div>
+                            Loading error logs...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Section -->
+            <div id="analytics" class="content-section">
+                <div class="content-header">
+                    <h2>Advanced Analytics</h2>
+                    <div class="breadcrumb">Home / Analytics</div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">MBTI Distribution</div>
+                        </div>
+                        <div id="mbtiChart" style="height: 250px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                            MBTI type distribution chart
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">Browser Distribution</div>
+                        </div>
+                        <div id="browserChart" style="height: 250px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary);">
+                            Browser usage chart
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Settings Section -->
+            <div id="settings" class="content-section">
+                <div class="content-header">
+                    <h2>System Settings</h2>
+                    <div class="breadcrumb">Home / Settings</div>
+                </div>
+
+                <div class="data-table">
+                    <div class="table-header">
+                        <div class="table-title">Cache Configuration</div>
+                    </div>
+                    <div style="padding: 2rem;">
+                        <div class="form-group">
+                            <label>Similarity Threshold</label>
+                            <input type="range" min="0.5" max="1.0" step="0.05" value="0.9" id="similarityThreshold" class="form-control">
+                            <small>Current: <span id="thresholdValue">90%</span></small>
+                        </div>
+                        <div class="form-group">
+                            <label>Cache Expiry (days)</label>
+                            <input type="number" min="1" max="365" value="30" id="cacheExpiry" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Rate Limit (requests per hour)</label>
+                            <input type="number" min="10" max="1000" value="100" id="rateLimit" class="form-control">
+                        </div>
+                        <button class="btn btn-primary" onclick="updateSettings()">
+                            <i class="fas fa-save"></i> Save Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Global variables
+        let authToken = null;
+        let refreshInterval = null;
+
+        // API base URL
+        const API_BASE_URL = 'http://localhost:8000';
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            setupEventListeners();
+        });
+
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
+
+            // Menu navigation
+            document.querySelectorAll('.menu-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.dataset.section;
+                    showSection(section);
+                    
+                    // Update active menu item
+                    document.querySelectorAll('.menu-link').forEach(l => l.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Settings form
+            document.getElementById('similarityThreshold').addEventListener('input', function() {
+                document.getElementById('thresholdValue').textContent = Math.round(this.value * 100) + '%';
+            });
+        }
+
+        function checkAuth() {
+            authToken = localStorage.getItem('adminToken');
+            if (authToken) {
+                showDashboard();
+                loadDashboardData();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+        }
+
+        function showDashboard() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            
+            // Start refresh interval
+            if (refreshInterval) clearInterval(refreshInterval);
+            refreshInterval = setInterval(loadDashboardData, 30000); // Refresh every 30 seconds
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    authToken = data.token;
+                    localStorage.setItem('adminToken', authToken);
+                    showDashboard();
+                    loadDashboardData();
+                } else {
+                    errorDiv.textContent = data.error || 'Login failed';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (error) {
+                errorDiv.textContent = 'Connection error. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            authToken = null;
+            if (refreshInterval) clearInterval(refreshInterval);
+            showLogin();
+        }
+
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName).classList.add('active');
+            
+            // Load section data
+            switch(sectionName) {
+                case 'overview':
+                    loadDashboardData();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'cache':
+                    loadCache();
+                    break;
+                case 'errors':
+                    loadErrors();
+                    break;
+                case 'analytics':
+                    loadAnalytics();
+                    break;
+            }
+        }
+
+        async function apiCall(endpoint, options = {}) {
+            const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+                ...options,
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            });
+
+            if (response.status === 401) {
+                logout();
+                throw new Error('Authentication failed');
+            }
+
+            return response.json();
+        }
+
+        async function loadDashboardData() {
+            try {
+                const [cacheStats, userStats] = await Promise.all([
+                    apiCall('/admin/cache-stats'),
+                    apiCall('/admin/user-analytics')
+                ]);
+
+                // Update overview stats
+                if (cacheStats.success) {
+                    const stats = cacheStats.cache_statistics;
+                    document.getElementById('cacheHitRate').textContent = 
+                        stats.cache_performance.hit_rate_percentage + '%';
+                    document.getElementById('totalAnalyses').textContent = 
+                        stats.cache_storage.total_entries;
+                }
+
+                if (userStats.success) {
+                    const stats = userStats.user_analytics;
+                    document.getElementById('totalUsers').textContent = stats.total_users;
+                }
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+            }
+        }
+
+        async function loadUsers() {
+            const container = document.getElementById('usersTableContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading users...</div>';
+
+            try {
+                const data = await apiCall('/admin/user-analytics');
+                
+                if (data.success) {
+                    const users = data.user_analytics.top_users;
+                    
+                    let tableHTML = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Requests</th>
+                                    <th>First Seen</th>
+                                    <th>Last Seen</th>
+                                    <th>IPs</th>
+                                    <th>Countries</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    users.forEach(user => {
+                        tableHTML += `
+                            <tr class="clickable-row" onclick="openUserModal('${user.fingerprint}')">
+                                <td><code>${user.fingerprint}</code></td>
+                                <td><span class="badge badge-info">${user.request_count}</span></td>
+                                <td>${new Date(user.first_seen).toLocaleDateString()}</td>
+                                <td>${new Date(user.last_seen).toLocaleDateString()}</td>
+                                <td>${user.ip_count}</td>
+                                <td>${user.countries.join(', ')}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tableHTML += '</tbody></table>';
+                    container.innerHTML = tableHTML;
+                } else {
+                    container.innerHTML = '<div class="loading">Error loading users</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="loading">Error loading users</div>';
+            }
+        }
+
+        async function loadCache() {
+            const container = document.getElementById('cacheTableContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading cache...</div>';
+
+            try {
+                const data = await apiCall('/admin/cache-details');
+                
+                if (data.success) {
+                    const entries = data.cache_details.recent_entries;
+                    
+                    let tableHTML = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Text Preview</th>
+                                    <th>Length</th>
+                                    <th>MBTI</th>
+                                    <th>User IP</th>
+                                    <th>Cached</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    entries.forEach(entry => {
+                        tableHTML += `
+                            <tr class="clickable-row" onclick="openCacheModal('${entry.id}')">
+                                <td><code>${entry.id}</code></td>
+                                <td>${entry.text_preview}</td>
+                                <td>${entry.text_length} chars</td>
+                                <td><span class="badge badge-info">${entry.mbti_type}</span></td>
+                                <td>${entry.user_ip}</td>
+                                <td>${new Date(entry.timestamp).toLocaleDateString()}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tableHTML += '</tbody></table>';
+                    container.innerHTML = tableHTML;
+                } else {
+                    container.innerHTML = '<div class="loading">Error loading cache</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="loading">Error loading cache</div>';
+            }
+        }
+
+        async function loadErrors() {
+            const container = document.getElementById('errorsTableContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div>Loading errors...</div>';
+
+            try {
+                const data = await apiCall('/admin/error-logs');
+                
+                if (data.success) {
+                    const errors = data.error_logs.recent_errors;
+                    
+                    let tableHTML = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Type</th>
+                                    <th>Message</th>
+                                    <th>Text Preview</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    errors.forEach(error => {
+                        tableHTML += `
+                            <tr>
+                                <td>${new Date(error.timestamp).toLocaleString()}</td>
+                                <td><span class="badge badge-danger">${error.error_type}</span></td>
+                                <td>${error.message}</td>
+                                <td>${error.text_preview}</td>
+                            </tr>
+                        `;
+                    });
+
+                    tableHTML += '</tbody></table>';
+                    container.innerHTML = tableHTML;
+
+                    // Update error count in overview
+                    document.getElementById('errorCount').textContent = errors.length;
+                } else {
+                    container.innerHTML = '<div class="loading">Error loading error logs</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="loading">Error loading error logs</div>';
+            }
+        }
+
+        async function loadAnalytics() {
+            // This would load more detailed analytics
+            console.log('Loading analytics...');
+        }
+
+        async function cleanupCache() {
+            if (!confirm('Are you sure you want to cleanup expired cache entries?')) return;
+
+            try {
+                const data = await apiCall('/admin/cache-cleanup', { method: 'POST' });
+                if (data.success) {
+                    alert(`Cache cleanup completed. Removed ${data.removed_entries} expired entries.`);
+                    loadCache(); // Reload cache table
+                }
+            } catch (error) {
+                alert('Error during cache cleanup');
+            }
+        }
+
+        function updateSettings() {
+            alert('Settings updated successfully');
+        }
+
+        // Modal Functions
+        function openUserModal(fingerprint) {
+            const modal = document.getElementById('userModal');
+            const modalBody = document.getElementById('userModalBody');
+            
+            modalBody.innerHTML = '<div class="loading"><div class="spinner"></div>Loading user details...</div>';
+            modal.classList.add('active');
+            
+            // Load detailed user information
+            loadUserDetails(fingerprint);
+        }
+
+        function openCacheModal(cacheId) {
+            const modal = document.getElementById('cacheModal');
+            const modalBody = document.getElementById('cacheModalBody');
+            
+            modalBody.innerHTML = '<div class="loading"><div class="spinner"></div>Loading cache details...</div>';
+            modal.classList.add('active');
+            
+            // Load detailed cache information
+            loadCacheDetails(cacheId);
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        async function loadUserDetails(fingerprint) {
+            try {
+                const data = await apiCall('/admin/user-details?fingerprint=' + encodeURIComponent(fingerprint));
+                const modalBody = document.getElementById('userModalBody');
+                
+                if (data.success) {
+                    const user = data.user_details;
+                    modalBody.innerHTML = generateUserDetailsHTML(user);
+                } else {
+                    modalBody.innerHTML = '<div class="loading">Error loading user details</div>';
+                }
+            } catch (error) {
+                document.getElementById('userModalBody').innerHTML = '<div class="loading">Error loading user details</div>';
+            }
+        }
+
+        async function loadCacheDetails(cacheId) {
+            try {
+                const data = await apiCall('/admin/cache-entry?id=' + encodeURIComponent(cacheId));
+                const modalBody = document.getElementById('cacheModalBody');
+                
+                if (data.success) {
+                    const entry = data.cache_entry;
+                    modalBody.innerHTML = generateCacheDetailsHTML(entry);
+                } else {
+                    modalBody.innerHTML = '<div class="loading">Error loading cache details</div>';
+                }
+            } catch (error) {
+                document.getElementById('cacheModalBody').innerHTML = '<div class="loading">Error loading cache details</div>';
+            }
+        }
+
+        function generateUserDetailsHTML(user) {
+            return `
+                <div class="detail-section">
+                    <h4><i class="fas fa-fingerprint"></i> User Identity</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Fingerprint</div>
+                            <div class="detail-value"><code>${user.fingerprint}</code></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">First Seen</div>
+                            <div class="detail-value">${new Date(user.first_seen).toLocaleString()}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Last Seen</div>
+                            <div class="detail-value">${new Date(user.last_seen).toLocaleString()}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Total Requests</div>
+                            <div class="detail-value"><span class="badge badge-info">${user.request_count}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-network-wired"></i> Network Information</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">IP Addresses</div>
+                            <div class="detail-value">${user.ip_addresses.join(', ')}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Countries</div>
+                            <div class="detail-value">${user.countries.join(', ')}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Connection Type</div>
+                            <div class="detail-value">${user.detailed_capabilities?.connection_type || 'Unknown'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-browser"></i> Browser & Device Information</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Browser</div>
+                            <div class="detail-value">${user.browser_info?.browser || 'Unknown'} ${user.browser_info?.version || ''}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Operating System</div>
+                            <div class="detail-value">${user.browser_info?.os || 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Device Type</div>
+                            <div class="detail-value">${user.browser_info?.device || 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Architecture</div>
+                            <div class="detail-value">${user.detailed_capabilities?.architecture || 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Browser Engine</div>
+                            <div class="detail-value">${user.detailed_capabilities?.browser_engine || 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Languages</div>
+                            <div class="detail-value">${user.detailed_capabilities?.preferred_languages?.join(', ') || 'Unknown'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-shield-alt"></i> Security & Capabilities</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">HTTPS Support</div>
+                            <div class="detail-value"><span class="badge ${user.detailed_capabilities?.security_capabilities?.https_supported ? 'badge-success' : 'badge-warning'}">${user.detailed_capabilities?.security_capabilities?.https_supported ? 'Yes' : 'No'}</span></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Compression Support</div>
+                            <div class="detail-value">${Object.entries(user.detailed_capabilities?.compression_support || {}).filter(([k,v]) => v).map(([k,v]) => k.toUpperCase()).join(', ') || 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Bot Detection</div>
+                            <div class="detail-value"><span class="badge ${user.browser_info?.is_bot ? 'badge-danger' : 'badge-success'}">${user.browser_info?.is_bot ? 'Bot' : 'Human'}</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-clock"></i> Recent Activity</h4>
+                    <div class="text-preview" style="max-height: 150px;">
+${user.request_times?.slice(-10).map(time => new Date(time).toLocaleString()).join('\n') || 'No recent activity'}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateCacheDetailsHTML(entry) {
+            const response = entry.response?.response || {}; // Fixed: access nested response object
+            return `
+                <div class="detail-section">
+                    <h4><i class="fas fa-info-circle"></i> Cache Entry Information</h4>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Cache ID</div>
+                            <div class="detail-value"><code>${entry.id}</code></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Timestamp</div>
+                            <div class="detail-value">${new Date(entry.timestamp).toLocaleString()}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Text Length</div>
+                            <div class="detail-value">${entry.metadata?.text_length || 0} characters</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">User IP</div>
+                            <div class="detail-value">${entry.metadata?.ip || 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">User Fingerprint</div>
+                            <div class="detail-value"><code>${entry.user_fingerprint || 'Unknown'}</code></div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Country</div>
+                            <div class="detail-value">${entry.metadata?.country || 'Unknown'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-edit"></i> User Input Text</h4>
+                    <div class="text-preview">${entry.input_text || 'No input text available'}</div>
+                </div>
+
+                <div class="detail-section">
+                    <h4><i class="fas fa-brain"></i> AI Analysis Results</h4>
+                    <div class="response-preview">
+                        <div class="personality-traits">
+                            <div class="trait-card">
+                                <div class="trait-name">Openness</div>
+                                <div class="trait-score">${Math.round((response.openness || 0) * 100)}%</div>
+                            </div>
+                            <div class="trait-card">
+                                <div class="trait-name">Conscientiousness</div>
+                                <div class="trait-score">${Math.round((response.conscientiousness || 0) * 100)}%</div>
+                            </div>
+                            <div class="trait-card">
+                                <div class="trait-name">Extraversion</div>
+                                <div class="trait-score">${Math.round((response.extraversion || 0) * 100)}%</div>
+                            </div>
+                            <div class="trait-card">
+                                <div class="trait-name">Agreeableness</div>
+                                <div class="trait-score">${Math.round((response.agreeableness || 0) * 100)}%</div>
+                            </div>
+                            <div class="trait-card">
+                                <div class="trait-name">Neuroticism</div>
+                                <div class="trait-score">${Math.round((response.neuroticism || 0) * 100)}%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-grid">
+                            <div class="detail-item">
+                                <div class="detail-label">MBTI Type</div>
+                                <div class="detail-value"><span class="badge badge-info">${response.mbti_type || 'Unknown'}</span></div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Tone Analysis</div>
+                                <div class="detail-value">${response.tone_analysis || 'Unknown'}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">Writing Style</div>
+                                <div class="detail-value">${response.writing_style || 'Unknown'}</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 1rem;">
+                            <div class="detail-label">Summary</div>
+                            <div class="text-preview" style="background: rgba(99, 102, 241, 0.1); max-height: 150px;">
+${response.summary || 'No summary available'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+            }
+        });
+    </script>
+
+    <!-- User Details Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-user"></i> User Details</h3>
+                <button class="modal-close" onclick="closeModal('userModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="userModalBody" class="modal-body">
+                <!-- User details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cache Details Modal -->
+    <div id="cacheModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-database"></i> Cache Entry Details</h3>
+                <button class="modal-close" onclick="closeModal('cacheModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="cacheModalBody" class="modal-body">
+                <!-- Cache details will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

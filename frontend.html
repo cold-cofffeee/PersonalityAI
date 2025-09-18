@@ -314,6 +314,41 @@
             border-left: 4px solid var(--primary-color);
         }
 
+        /* Cache Info Styles */
+        .cache-info {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .cache-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--success-color);
+        }
+
+        .cache-status i {
+            color: #10b981;
+        }
+
+        .response-time {
+            margin-left: auto;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .cache-hit {
+            color: #10b981 !important;
+        }
+
+        .cache-miss {
+            color: #f59e0b !important;
+        }
+
         /* Features Section */
         .features {
             padding: 80px 0;
@@ -558,6 +593,15 @@
                             <p><strong>Writing Style:</strong> <span id="writingStyle">-</span></p>
                             <p><strong>Tone Analysis:</strong> <span id="toneAnalysis">-</span></p>
                         </div>
+
+                        <!-- Cache Performance Info -->
+                        <div id="cacheInfo" class="cache-info" style="display: none;">
+                            <div class="cache-status">
+                                <i class="fas fa-bolt"></i>
+                                <span id="cacheStatusText">Analysis completed</span>
+                                <span id="responseTime" class="response-time">0ms</span>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Default Message -->
@@ -744,6 +788,37 @@
             document.getElementById('summaryText').textContent = analysis.summary;
             document.getElementById('writingStyle').textContent = analysis.writing_style;
             document.getElementById('toneAnalysis').textContent = analysis.tone_analysis;
+            
+            // Update cache info if available
+            updateCacheInfo(data);
+        }
+
+        // Update cache information display
+        function updateCacheInfo(data) {
+            const cacheInfo = document.getElementById('cacheInfo');
+            const cacheStatusText = document.getElementById('cacheStatusText');
+            const responseTime = document.getElementById('responseTime');
+            
+            if (data.cache_info) {
+                const info = data.cache_info;
+                const isHit = info.cache_hit;
+                
+                cacheStatusText.innerHTML = isHit ? 
+                    '<i class="fas fa-rocket"></i> Cache Hit - Lightning Fast!' : 
+                    '<i class="fas fa-brain"></i> Fresh AI Analysis';
+                    
+                cacheStatusText.className = isHit ? 'cache-hit' : 'cache-miss';
+                
+                responseTime.textContent = `${info.response_time_ms}ms`;
+                
+                if (isHit && info.similarity) {
+                    responseTime.textContent += ` (${Math.round(info.similarity * 100)}% match)`;
+                }
+                
+                cacheInfo.style.display = 'block';
+            } else {
+                cacheInfo.style.display = 'none';
+            }
         }
 
         // Analyze personality
@@ -801,6 +876,32 @@
 
         // Event listeners
         analyzeBtn.addEventListener('click', analyzePersonality);
+
+        // Load cache statistics on page load
+        async function loadCacheStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/cache-info`);
+                const data = await response.json();
+                
+                if (data.cache_enabled) {
+                    console.log('Cache Statistics:', {
+                        hitRate: data.hit_rate_percentage + '%',
+                        totalAnalyses: data.total_cached_analyses,
+                        avgResponseTime: data.average_response_time_ms + 'ms'
+                    });
+                    
+                    // You could display this in a subtle way in the UI
+                    // For now, it's available in the console for monitoring
+                }
+            } catch (error) {
+                console.log('Cache stats not available:', error.message);
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCacheStats();
+        });
 
         // Allow Enter key to submit (with Ctrl/Cmd for new line)
         textInput.addEventListener('keydown', (e) => {

@@ -1,3 +1,4 @@
 cache
+cache_data
 .env
 __pycache__
