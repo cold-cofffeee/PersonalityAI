@@ -1,8 +1,10 @@
 
 import json
 import os
-from datetime import datetime, timezone
-from typing import Dict, Any
+import shutil
+from datetime import datetime, timezone, timedelta
+from typing import Dict, Any, Optional, List
+from pathlib import Path
 
 def utc_timestamp() -> datetime:
     """Return current UTC timestamp as datetime object"""
@@ -13,22 +15,84 @@ def utc_timestamp_str() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 class CacheLogger:
-    """Handles caching of API requests and responses to JSON files"""
+    """
+    Enhanced caching system for API requests and responses.
+    Handles file operations, cleanup, and statistics with better error handling.
+    """
     
     def __init__(self, cache_dir: str = "cache"):
-        self.cache_dir = cache_dir
+        self.cache_dir = Path(cache_dir)
         self.ensure_cache_directory()
+        self._stats = {
+            "requests_logged": 0,
+            "responses_logged": 0,
+            "errors_logged": 0,
+            "cache_hits": 0,
+            "cache_misses": 0
+        }
     
     def ensure_cache_directory(self):
-        """Create cache directory if it doesn't exist"""
-        if not os.path.exists(self.cache_dir):
-            os.makedirs(self.cache_dir)
-            print(f"Created cache directory: {self.cache_dir}")
+        """Create cache directory structure if it doesn't exist"""
+        try:
+            # Create main cache directory
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+            
+            # Create subdirectories for organization
+            subdirs = ["requests", "responses", "errors", "gemini", "logs"]
+            for subdir in subdirs:
+                (self.cache_dir / subdir).mkdir(exist_ok=True)
+                
+            # Create .gitignore for cache directory
+            gitignore_path = self.cache_dir / ".gitignore"
+            if not gitignore_path.exists():
+                gitignore_path.write_text("*\n!.gitignore\n")
+                
+        except Exception as e:
+            # Fallback to basic directory creation
+            os.makedirs(self.cache_dir, exist_ok=True)
+            print(f"Warning: Could not create cache subdirectories: {e}")
     
-    def generate_filename(self, prefix: str = "log") -> str:
-        """Generate filename with timestamp"""
+    def generate_filename(self, prefix: str = "log", category: str = "") -> str:
+        """Generate filename with timestamp and category"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")[:-3]  # milliseconds
+        if category:
+            return f"{prefix}_{category}_{timestamp}.json"
         return f"{prefix}_{timestamp}.json"
+    
+    def _safe_write_json(self, filepath: Path, data: Dict[str, Any]) -> bool:
+        """
+        Safely write JSON data to file with error handling.
+        
+        Args:
+            filepath: Path to write to
+            data: Data to write
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            # Create directory if it doesn't exist
+            filepath.parent.mkdir(parents=True, exist_ok=True)
+            
+            # Write to temporary file first, then rename for atomicity
+            temp_filepath = filepath.with_suffix('.tmp')
+            
+            with open(temp_filepath, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False, default=str)
+            
+            # Atomic rename
+            temp_filepath.rename(filepath)
+            return True
+            
+        except Exception as e:
+            print(f"Failed to write cache file {filepath}: {e}")
+            # Clean up temporary file if it exists
+            if temp_filepath.exists():
+                try:
+                    temp_filepath.unlink()
+                except:
+                    pass
+            return False
     
     def log_request(self, request_data: Dict[str, Any]) -> str:
         """Log incoming request and return the log ID"""

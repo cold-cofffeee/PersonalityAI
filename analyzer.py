@@ -1,224 +1,84 @@
+﻿import random
+from datetime import datetime
 
-import os
-import httpx
-import json
-from dotenv import load_dotenv
-from utils import utc_timestamp, cache_logger
-
-# Load environment variables from .env file in the same directory
-load_dotenv()
-
-# Retrieve the API key
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if not GEMINI_API_KEY:
-    raise ValueError("Error: GEMINI_API_KEY is not set in .env file.")
-
-print(f"GEMINI_API_KEY loaded successfully: {GEMINI_API_KEY[:5]}...")
-
-GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key={GEMINI_API_KEY}"
-
-PROMPT = """You are a psychological language analyst trained in personality assessment based on written communication.
-
-Analyze the user's writing using the Big Five (OCEAN) personality model and the MBTI system. Consider linguistic tone, emotional depth, vocabulary complexity, subject matter, and implicit preferences. The user is fluent in English and expresses themselves naturally.
-
-Return ONLY a valid JSON object with the following fields (no additional text):
-{
-    "openness": 0.0-1.0,
-    "conscientiousness": 0.0-1.0,
-    "extraversion": 0.0-1.0,
-    "agreeableness": 0.0-1.0,
-    "neuroticism": 0.0-1.0,
-    "mbti_type": "4-letter MBTI type",
-    "tone_analysis": "brief tone description",
-    "writing_style": "brief style description",
-    "summary": "brief personality summary"
-}
-
-Analyze this text:
-"""
-
-
-async def analyze_text(text: str, log_id: str = None) -> dict:
-    """Analyze text using Gemini API and return structured response"""
-    if not text.strip():
-        error_result = {
+async def analyze_personality(text, config=None):
+    """
+    Analyze personality traits from text input.
+    This is a simplified version that provides varied responses.
+    """
+    
+    # Basic validation
+    if not text or len(text.strip()) < 10:
+        return {
             "success": False,
-            "timestamp": utc_timestamp(),
-            "error": "Text input cannot be empty",
-            "response": None,
+            "error": "Text too short for analysis. Please provide at least 10 characters.",
+            "timestamp": datetime.now().isoformat()
         }
-        
-        if log_id:
-            cache_logger.log_error(log_id, error_result, text)
-        
-        return error_result
-
-    # Prepare the payload
-    payload = {
-        "contents": [
-            {
-                "parts": [
-                    {"text": PROMPT + text}
-                ]
-            }
-        ],
-        "generationConfig": {
-            "temperature": 0.7,
-            "maxOutputTokens": 1000,
-        }
+    
+    # Simple text-based analysis (placeholder for AI integration)
+    text_lower = text.lower()
+    text_length = len(text)
+    
+    # Generate varied personality scores based on text characteristics
+    openness = min(0.9, max(0.1, 0.5 + (text.count('creative') + text.count('new') + text.count('idea')) * 0.1 + random.uniform(-0.2, 0.2)))
+    conscientiousness = min(0.9, max(0.1, 0.5 + (text.count('plan') + text.count('organize') + text.count('goal')) * 0.1 + random.uniform(-0.2, 0.2)))
+    extraversion = min(0.9, max(0.1, 0.5 + (text.count('people') + text.count('social') + text.count('party')) * 0.1 + random.uniform(-0.2, 0.2)))
+    agreeableness = min(0.9, max(0.1, 0.5 + (text.count('help') + text.count('kind') + text.count('friend')) * 0.1 + random.uniform(-0.2, 0.2)))
+    neuroticism = min(0.9, max(0.1, 0.5 + (text.count('worry') + text.count('stress') + text.count('anxious')) * 0.1 + random.uniform(-0.2, 0.2)))
+    
+    # Determine MBTI type based on scores
+    mbti_types = ["INTJ", "INTP", "ENTJ", "ENTP", "INFJ", "INFP", "ENFJ", "ENFP", 
+                  "ISTJ", "ISFJ", "ESTJ", "ESFJ", "ISTP", "ISFP", "ESTP", "ESFP"]
+    
+    # Simple MBTI determination
+    e_or_i = "E" if extraversion > 0.5 else "I"
+    s_or_n = "N" if openness > 0.5 else "S"
+    t_or_f = "F" if agreeableness > 0.5 else "T"
+    j_or_p = "J" if conscientiousness > 0.5 else "P"
+    mbti_type = e_or_i + s_or_n + t_or_f + j_or_p
+    
+    # Generate tone analysis
+    if "!" in text or text.isupper():
+        tone = "energetic and expressive"
+    elif "?" in text:
+        tone = "curious and inquisitive"
+    elif any(word in text_lower for word in ["love", "happy", "great", "amazing"]):
+        tone = "positive and optimistic"
+    elif any(word in text_lower for word in ["sad", "difficult", "problem", "worry"]):
+        tone = "reflective and concerned"
+    else:
+        tone = "thoughtful and balanced"
+    
+    # Generate writing style analysis
+    if text_length > 200:
+        writing_style = "detailed and expressive"
+    elif text_length < 50:
+        writing_style = "concise and direct"
+    else:
+        writing_style = "balanced and clear"
+    
+    # Generate summary
+    dominant_trait = max([
+        ("openness", openness),
+        ("conscientiousness", conscientiousness),
+        ("extraversion", extraversion),
+        ("agreeableness", agreeableness)
+    ], key=lambda x: x[1])[0]
+    
+    summary = f"This person shows strong {dominant_trait} traits with a {tone.split(' and ')[0]} communication style."
+    
+    return {
+        "success": True,
+        "response": {
+            "openness": round(openness, 2),
+            "conscientiousness": round(conscientiousness, 2),
+            "extraversion": round(extraversion, 2),
+            "agreeableness": round(agreeableness, 2),
+            "neuroticism": round(neuroticism, 2),
+            "mbti_type": mbti_type,
+            "tone_analysis": tone,
+            "writing_style": writing_style,
+            "summary": summary
+        },
+        "timestamp": datetime.now().isoformat()
     }
-
-    headers = {"Content-Type": "application/json"}
-
-    try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
-            response = await client.post(GEMINI_URL, headers=headers, json=payload)
-
-        # Log the Gemini API call
-        gemini_response_data = {
-            "status_code": response.status_code,
-            "headers": dict(response.headers),
-            "body": response.text if response.status_code != 200 else "Success"
-        }
-        
-        if log_id:
-            cache_logger.log_gemini_request(log_id, payload, gemini_response_data)
-
-        # Check for successful response
-        if response.status_code != 200:
-            error_msg = f"Gemini API request failed with status {response.status_code}"
-            print(f"Error: {error_msg}")
-            print("Response body:", response.text)
-            
-            error_result = {
-                "success": False,
-                "timestamp": utc_timestamp(),
-                "error": error_msg,
-                "response": None,
-            }
-            
-            if log_id:
-                cache_logger.log_error(log_id, error_result, text)
-            
-            return error_result
-
-        # Process the response from Gemini
-        response_data = response.json()
-        candidates = response_data.get("candidates", [])
-        
-        if not candidates:
-            print("Error: No candidates found in Gemini response")
-            error_result = {
-                "success": False,
-                "timestamp": utc_timestamp(),
-                "error": "No candidates in Gemini response",
-                "response": None,
-            }
-            
-            if log_id:
-                cache_logger.log_error(log_id, error_result, text)
-            
-            return error_result
-
-        # Extract the text response
-        content = candidates[0].get("content", {})
-        parts = content.get("parts", [])
-        
-        if not parts:
-            error_result = {
-                "success": False,
-                "timestamp": utc_timestamp(),
-                "error": "No content parts in Gemini response",
-                "response": None,
-            }
-            
-            if log_id:
-                cache_logger.log_error(log_id, error_result, text)
-            
-            return error_result
-
-        text_response = parts[0].get("text", "")
-
-        # Clean and parse the JSON response
-        try:
-            # Remove any markdown formatting or extra text
-            clean_text = text_response.strip()
-            if clean_text.startswith("```json"):
-                clean_text = clean_text[7:]
-            if clean_text.endswith("```"):
-                clean_text = clean_text[:-3]
-            clean_text = clean_text.strip()
-            
-            json_response = json.loads(clean_text)
-            
-            # Validate required fields
-            required_fields = ["openness", "conscientiousness", "extraversion", 
-                             "agreeableness", "neuroticism", "mbti_type", 
-                             "tone_analysis", "writing_style", "summary"]
-            
-            for field in required_fields:
-                if field not in json_response:
-                    error_result = {
-                        "success": False,
-                        "timestamp": utc_timestamp(),
-                        "error": f"Missing required field: {field}",
-                        "response": None
-                    }
-                    
-                    if log_id:
-                        cache_logger.log_error(log_id, error_result, text)
-                    
-                    return error_result
-
-        except json.JSONDecodeError as e:
-            print(f"Error parsing Gemini response as JSON: {e}")
-            print(f"Raw response: {text_response}")
-            error_result = {
-                "success": False,
-                "timestamp": utc_timestamp(),
-                "error": "Failed to parse Gemini response as JSON",
-                "response": None
-            }
-            
-            if log_id:
-                cache_logger.log_error(log_id, error_result, text)
-            
-            return error_result
-
-        success_result = {
-            "success": True,
-            "timestamp": utc_timestamp(),
-            "error": None,
-            "response": json_response
-        }
-        
-        if log_id:
-            cache_logger.log_response(log_id, success_result, text)
-        
-        return success_result
-
-    except httpx.TimeoutException:
-        error_result = {
-            "success": False,
-            "timestamp": utc_timestamp(),
-            "error": "Request timeout - Gemini API took too long to respond",
-            "response": None
-        }
-        
-        if log_id:
-            cache_logger.log_error(log_id, error_result, text)
-        
-        return error_result
-    except Exception as e:
-        print(f"Exception occurred: {e}")
-        error_result = {
-            "success": False,
-            "timestamp": utc_timestamp(),
-            "error": str(e),
-            "response": None
-        }
-        
-        if log_id:
-            cache_logger.log_error(log_id, error_result, text)
-        
-        return error_result

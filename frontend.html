@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PersonalityAI - Discover Your True Self</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #ec4899;
+            --accent-color: #06b6d4;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --border-color: #475569;
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #ec4899 100%);
+            --gradient-2: linear-gradient(135deg, #06b6d4 0%, #10b981 100%);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary-color);
+        }
+
+        .cta-button {
+            background: var(--gradient-1);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Analysis Section */
+        .analysis-section {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin-bottom: 60px;
+        }
+
+        .analysis-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .input-section {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .input-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 200px;
+            padding: 20px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .text-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .analyze-btn {
+            width: 100%;
+            margin-top: 20px;
+            padding: 16px;
+            font-size: 18px;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .results-section {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            min-height: 400px;
+        }
+
+        .results-section h3 {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            color: var(--text-primary);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .personality-results {
+            display: none;
+        }
+
+        .mbti-badge {
+            display: inline-block;
+            background: var(--gradient-2);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 18px;
+            margin-bottom: 24px;
+        }
+
+        .trait-item {
+            margin-bottom: 20px;
+        }
+
+        .trait-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .trait-bar {
+            width: 100%;
+            height: 12px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .trait-fill {
+            height: 100%;
+            background: var(--gradient-1);
+            border-radius: 6px;
+            transition: width 1s ease;
+        }
+
+        .analysis-text {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* Features Section */
+        .features {
+            padding: 80px 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 16px;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Footer */
+        .footer {
+            padding: 60px 0 40px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h4 {
+            font-size: 1.25rem;
+            margin-bottom: 20px;
+            color: var(--text-primary);
+        }
+
+        .footer-section a {
+            display: block;
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .analysis-container {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .input-section,
+            .results-section {
+                padding: 24px;
+            }
+        }
+
+        /* Alert Styles */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .alert.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+        }
+
+        .alert.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="logo">
+                <i class="fas fa-brain"></i> PersonalityAI
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#analyze">Analyze</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#api">API</a></li>
+            </ul>
+            <a href="#analyze" class="cta-button">Try Free Analysis</a>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>Discover Your True Self</h1>
+            <p>Advanced AI-powered personality analysis using the Big Five model and MBTI classification. Get deep insights into your personality traits, communication style, and behavioral patterns.</p>
+            <a href="#analyze" class="cta-button">Start Your Analysis</a>
+        </div>
+    </section>
+
+    <!-- Analysis Section -->
+    <section id="analyze" class="analysis-section">
+        <div class="container">
+            <h2 class="section-title">Personality Analysis</h2>
+            <p class="section-subtitle">Write about yourself, your thoughts, or any topic that interests you. Our AI will analyze your writing style and personality traits.</p>
+            
+            <div class="analysis-container">
+                <!-- Input Section -->
+                <div class="input-section">
+                    <h3><i class="fas fa-edit"></i> Write Your Text</h3>
+                    <textarea 
+                        id="textInput" 
+                        class="text-input" 
+                        placeholder="Share your thoughts, experiences, or describe yourself. Write at least 50 words for better analysis. For example: 'I enjoy spending quiet evenings at home reading books and reflecting on life. I'm naturally curious about how things work and often find myself lost in thought about philosophical questions. When I meet new people, I prefer small group conversations over large parties...'"
+                        rows="10"
+                    ></textarea>
+                    <button id="analyzeBtn" class="analyze-btn">
+                        <i class="fas fa-magic"></i> Analyze My Personality
+                    </button>
+                    <div id="alert" class="alert"></div>
+                </div>
+
+                <!-- Results Section -->
+                <div class="results-section">
+                    <h3><i class="fas fa-chart-bar"></i> Your Personality Profile</h3>
+                    
+                    <!-- Loading State -->
+                    <div id="loading" class="loading">
+                        <div class="loading-spinner"></div>
+                        <p>Analyzing your personality...</p>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="results" class="personality-results">
+                        <div id="mbtiType" class="mbti-badge">ENFJ</div>
+                        
+                        <div class="traits">
+                            <div class="trait-item">
+                                <div class="trait-label">
+                                    <span>Openness</span>
+                                    <span id="opennessValue">0%</span>
+                                </div>
+                                <div class="trait-bar">
+                                    <div id="opennessBar" class="trait-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="trait-item">
+                                <div class="trait-label">
+                                    <span>Conscientiousness</span>
+                                    <span id="conscientiousnessValue">0%</span>
+                                </div>
+                                <div class="trait-bar">
+                                    <div id="conscientiousnessBar" class="trait-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="trait-item">
+                                <div class="trait-label">
+                                    <span>Extraversion</span>
+                                    <span id="extraversionValue">0%</span>
+                                </div>
+                                <div class="trait-bar">
+                                    <div id="extraversionBar" class="trait-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="trait-item">
+                                <div class="trait-label">
+                                    <span>Agreeableness</span>
+                                    <span id="agreeablenessValue">0%</span>
+                                </div>
+                                <div class="trait-bar">
+                                    <div id="agreeablenessBar" class="trait-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+
+                            <div class="trait-item">
+                                <div class="trait-label">
+                                    <span>Neuroticism</span>
+                                    <span id="neuroticismValue">0%</span>
+                                </div>
+                                <div class="trait-bar">
+                                    <div id="neuroticismBar" class="trait-fill" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analysis-text">
+                            <h4>Analysis Summary</h4>
+                            <p id="summaryText">Your personality analysis will appear here.</p>
+                            <p><strong>Writing Style:</strong> <span id="writingStyle">-</span></p>
+                            <p><strong>Tone Analysis:</strong> <span id="toneAnalysis">-</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Default Message -->
+                    <div id="defaultMessage" class="analysis-text">
+                        <p>Enter some text about yourself and click "Analyze My Personality" to see your detailed personality profile including Big Five traits and MBTI type.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2 class="section-title">Powerful Features</h2>
+            <p class="section-subtitle">Advanced AI technology for accurate personality insights</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-brain feature-icon"></i>
+                    <h3>AI-Powered Analysis</h3>
+                    <p>Advanced machine learning models trained on psychological research to provide accurate personality assessments.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-chart-line feature-icon"></i>
+                    <h3>Big Five Model</h3>
+                    <p>Comprehensive analysis using the scientifically validated Big Five personality dimensions (OCEAN).</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-users feature-icon"></i>
+                    <h3>MBTI Classification</h3>
+                    <p>Myers-Briggs Type Indicator results to understand your personality type and preferences.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-language feature-icon"></i>
+                    <h3>Writing Style Analysis</h3>
+                    <p>Deep linguistic analysis of your writing patterns, tone, and communication style.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <h3>Privacy First</h3>
+                    <p>Your text is analyzed securely and privately. No data is stored or shared without consent.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <i class="fas fa-code feature-icon"></i>
+                    <h3>Developer API</h3>
+                    <p>Integrate personality analysis into your applications with our robust RESTful API.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Section -->
+    <section id="api" class="analysis-section">
+        <div class="container">
+            <h2 class="section-title">Developer API</h2>
+            <p class="section-subtitle">Integrate personality analysis into your applications</p>
+            
+            <div class="feature-card" style="max-width: 800px; margin: 0 auto; text-align: left;">
+                <h3><i class="fas fa-terminal"></i> API Endpoints</h3>
+                <p style="margin-bottom: 24px;">Our RESTful API provides easy integration for developers:</p>
+                
+                <div style="background: var(--bg-primary); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <code style="color: var(--accent-color);">POST /analyze</code><br>
+                    <small style="color: var(--text-secondary);">Analyze personality from text input</small>
+                </div>
+                
+                <div style="background: var(--bg-primary); padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <code style="color: var(--accent-color);">GET /docs</code><br>
+                    <small style="color: var(--text-secondary);">Interactive API documentation</small>
+                </div>
+                
+                <a href="http://localhost:8000/docs" target="_blank" class="cta-button">
+                    <i class="fas fa-external-link-alt"></i> View API Documentation
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h4>PersonalityAI</h4>
+                    <p style="color: var(--text-secondary);">Advanced AI-powered personality analysis for individuals and developers.</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Features</h4>
+                    <a href="#analyze">Free Analysis</a>
+                    <a href="#features">Big Five Model</a>
+                    <a href="#features">MBTI Classification</a>
+                    <a href="#api">Developer API</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Resources</h4>
+                    <a href="http://localhost:8000/docs" target="_blank">API Documentation</a>
+                    <a href="#features">How it Works</a>
+                    <a href="#features">Privacy Policy</a>
+                    <a href="#features">Terms of Service</a>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <a href="mailto:contact@personalityai.dev">contact@personalityai.dev</a>
+                    <a href="#features">Support Center</a>
+                    <a href="#features">Partnerships</a>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 PersonalityAI. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // API Configuration
+        const API_BASE_URL = 'http://localhost:8000';
+
+        // DOM Elements
+        const textInput = document.getElementById('textInput');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const defaultMessage = document.getElementById('defaultMessage');
+        const alert = document.getElementById('alert');
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Show alert
+        function showAlert(message, type = 'error') {
+            alert.textContent = message;
+            alert.className = `alert ${type}`;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Update personality results
+        function updateResults(data) {
+            const analysis = data.response;  // Changed from data.analysis to data.response
+            
+            // Update MBTI type
+            document.getElementById('mbtiType').textContent = analysis.mbti_type;
+            
+            // Update trait bars with animation
+            const traits = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism'];
+            
+            traits.forEach(trait => {
+                const value = Math.round(analysis[trait] * 100);
+                const valueEl = document.getElementById(`${trait}Value`);
+                const barEl = document.getElementById(`${trait}Bar`);
+                
+                valueEl.textContent = `${value}%`;
+                
+                // Animate bar
+                setTimeout(() => {
+                    barEl.style.width = `${value}%`;
+                }, 100);
+            });
+            
+            // Update text analysis
+            document.getElementById('summaryText').textContent = analysis.summary;
+            document.getElementById('writingStyle').textContent = analysis.writing_style;
+            document.getElementById('toneAnalysis').textContent = analysis.tone_analysis;
+        }
+
+        // Analyze personality
+        async function analyzePersonality() {
+            const text = textInput.value.trim();
+            
+            // Validation
+            if (!text) {
+                showAlert('Please enter some text to analyze.');
+                return;
+            }
+            
+            if (text.length < 10) {
+                showAlert('Please enter at least 10 characters for a meaningful analysis.');
+                return;
+            }
+
+            // Show loading state
+            loading.style.display = 'block';
+            results.style.display = 'none';
+            defaultMessage.style.display = 'none';
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Analyzing...';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    updateResults(data);
+                    loading.style.display = 'none';
+                    results.style.display = 'block';
+                    showAlert('Analysis completed successfully!', 'success');
+                } else {
+                    throw new Error(data.error || 'Analysis failed');
+                }
+                
+            } catch (error) {
+                console.error('Analysis error:', error);
+                loading.style.display = 'none';
+                defaultMessage.style.display = 'block';
+                showAlert(`Analysis failed: ${error.message}. Please try again.`);
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerHTML = '<i class="fas fa-magic"></i> Analyze My Personality';
+            }
+        }
+
+        // Event listeners
+        analyzeBtn.addEventListener('click', analyzePersonality);
+
+        // Allow Enter key to submit (with Ctrl/Cmd for new line)
+        textInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                analyzePersonality();
+            }
+        });
+
+        // Character counter (optional enhancement)
+        textInput.addEventListener('input', () => {
+            const length = textInput.value.length;
+            if (length >= 10) {
+                alert.style.display = 'none';
+            }
+        });
+
+        // Demo functionality - populate with sample text
+        function loadDemo() {
+            const demoText = `I've always been fascinated by the complexities of human behavior and psychology. In my free time, I enjoy reading philosophy books and having deep conversations with friends about life's big questions. I tend to be quite introspective and often spend time reflecting on my experiences and their meanings.
+
+When working on projects, I prefer to plan everything out carefully before diving in. I believe that attention to detail and thorough preparation are key to success. However, I also try to remain flexible and adapt when unexpected challenges arise.
+
+In social situations, I'm comfortable both in small intimate groups and larger gatherings, though I do need some alone time to recharge. I value genuine connections with people and am always eager to learn about different perspectives and life experiences.`;
+            
+            textInput.value = demoText;
+        }
+
+        // Add demo button (uncomment if needed)
+        // const demoBtn = document.createElement('button');
+        // demoBtn.textContent = 'Load Demo Text';
+        // demoBtn.className = 'cta-button';
+        // demoBtn.style.marginTop = '10px';
+        // demoBtn.onclick = loadDemo;
+        // document.querySelector('.input-section').appendChild(demoBtn);
+    </script>
+</body>
+</html>
