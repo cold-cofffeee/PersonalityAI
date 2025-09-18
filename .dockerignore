@@ -53,6 +53,7 @@ Thumbs.db
 *.log
 logs/
 cache/
+cache_data/
 .cache/
 
 # Testing
