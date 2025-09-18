@@ -11,19 +11,31 @@ class AdminAuth:
     """
     
     def __init__(self):
-        # Simple credential store (in production, use proper password hashing)
-        self.admin_credentials = {
-            "admin": "admin12345"  # username: password
-        }
+        # Get credentials from configuration (lazy loading)
+        self._config = None
+        self._admin_credentials = None
         
         # Active sessions store
         self.active_sessions = {}  # token: {username, expires, created_at}
         
-        # Session timeout (24 hours)
-        self.session_timeout = timedelta(hours=24)
+        # Session timeout (will be loaded from config)
+        self.session_timeout = timedelta(hours=24)  # default
         
         # Security bearer for token validation
         self.security = HTTPBearer()
+
+    @property
+    def admin_credentials(self):
+        """Lazy load admin credentials from config"""
+        if self._admin_credentials is None:
+            from config import get_config
+            config = get_config()
+            self._admin_credentials = {
+                config.admin.username: config.admin.password
+            }
+            # Also update session timeout
+            self.session_timeout = timedelta(hours=config.admin.session_timeout_hours)
+        return self._admin_credentials
     
     def _hash_password(self, password: str) -> str:
         """Hash password for secure storage (basic implementation)"""

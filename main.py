@@ -1,6 +1,7 @@
 
 import time
 import uuid
+import json
 from fastapi import FastAPI, HTTPException, Request, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -697,6 +698,61 @@ async def get_cache_entry_details(id: str, session = Depends(admin_auth.get_curr
     except Exception as e:
         logger.error(f"Error retrieving cache entry: {e}")
         raise HTTPException(status_code=500, detail="Could not retrieve cache entry")
+
+
+@app.get("/admin/chart-data")
+async def get_chart_data(session = Depends(admin_auth.get_current_user)):
+    """
+    Get data for admin dashboard charts
+    """
+    try:
+        # Get MBTI distribution from cache
+        cache_data = cache_manager.get_cache_stats()
+        
+        # Load cache entries for MBTI analysis
+        mbti_distribution = {}
+        browser_distribution = {}
+        
+        with open(cache_manager.cache_file, 'r') as f:
+            cache_entries = json.load(f)
+        
+        # Analyze MBTI types from cache entries
+        for entry in cache_entries.get("cache_entries", []):
+            response = entry.get("response", {})
+            if isinstance(response, dict) and "response" in response:
+                mbti_type = response["response"].get("mbti_type")
+                if mbti_type:
+                    mbti_distribution[mbti_type] = mbti_distribution.get(mbti_type, 0) + 1
+        
+        # Analyze browser distribution from user tracking
+        with open(cache_manager.users_file, 'r') as f:
+            users_data = json.load(f)
+        
+        for user_data in users_data.get("users", {}).values():
+            for user_agent in user_data.get("user_agents", []):
+                if "chrome" in user_agent.lower():
+                    browser_distribution["Chrome"] = browser_distribution.get("Chrome", 0) + 1
+                elif "firefox" in user_agent.lower():
+                    browser_distribution["Firefox"] = browser_distribution.get("Firefox", 0) + 1
+                elif "safari" in user_agent.lower():
+                    browser_distribution["Safari"] = browser_distribution.get("Safari", 0) + 1
+                elif "edge" in user_agent.lower():
+                    browser_distribution["Edge"] = browser_distribution.get("Edge", 0) + 1
+                else:
+                    browser_distribution["Other"] = browser_distribution.get("Other", 0) + 1
+        
+        return {
+            "success": True,
+            "charts": {
+                "mbti_distribution": mbti_distribution,
+                "browser_distribution": browser_distribution,
+                "total_analyses": len(cache_entries.get("cache_entries", [])),
+                "total_users": len(users_data.get("users", {}))
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error retrieving chart data: {e}")
+        raise HTTPException(status_code=500, detail="Could not retrieve chart data")
 
 
 if __name__ == "__main__":

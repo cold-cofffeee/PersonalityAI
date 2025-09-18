@@ -55,6 +55,14 @@ class AppConfig:
     environment: str = "development"
 
 
+@dataclass
+class AdminConfig:
+    """Admin panel configuration settings."""
+    username: str = "admin"
+    password: str = "admin123"
+    session_timeout_hours: int = 24
+
+
 class Config:
     """Main configuration class that aggregates all settings."""
     
@@ -117,6 +125,12 @@ class Config:
             version=os.getenv("APP_VERSION", "1.0.0"),
             description=os.getenv("APP_DESCRIPTION", "Advanced AI-Powered Personality Analysis"),
             environment=os.getenv("ENVIRONMENT", "development")
+        )
+        
+        self.admin = AdminConfig(
+            username=os.getenv("ADMIN_USERNAME", "admin"),
+            password=os.getenv("ADMIN_PASSWORD", "admin123"),
+            session_timeout_hours=int(os.getenv("ADMIN_SESSION_TIMEOUT_HOURS", "24"))
         )
     
     @property

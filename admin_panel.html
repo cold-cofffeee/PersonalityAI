@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PersonalityAI - Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
             --primary-color: #6366f1;
@@ -362,6 +363,32 @@
             font-size: 1.25rem;
             font-weight: 600;
             margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .chart-title i {
+            color: var(--primary-color);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
         }
 
         /* Badges */
@@ -734,6 +761,33 @@
                     </div>
                 </div>
 
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                <i class="fas fa-user-friends"></i> MBTI Distribution
+                            </div>
+                            <p>Personality type distribution across all analyses</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="mbtiChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">
+                                <i class="fas fa-globe"></i> Browser Distribution
+                            </div>
+                            <p>User browser preferences and usage patterns</p>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="browserChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="chart-container">
                     <div class="chart-header">
                         <div class="chart-title">Usage Analytics</div>
@@ -1047,9 +1101,10 @@
 
         async function loadDashboardData() {
             try {
-                const [cacheStats, userStats] = await Promise.all([
+                const [cacheStats, userStats, chartData] = await Promise.all([
                     apiCall('/admin/cache-stats'),
-                    apiCall('/admin/user-analytics')
+                    apiCall('/admin/user-analytics'),
+                    apiCall('/admin/chart-data')
                 ]);
 
                 // Update overview stats
@@ -1066,9 +1121,145 @@
                     document.getElementById('totalUsers').textContent = stats.total_users;
                 }
 
+                // Update charts
+                if (chartData.success) {
+                    updateCharts(chartData.charts);
+                }
+
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
             }
+        }
+
+        function updateCharts(chartData) {
+            // Update MBTI Distribution Chart
+            updateMBTIChart(chartData.mbti_distribution);
+            
+            // Update Browser Distribution Chart
+            updateBrowserChart(chartData.browser_distribution);
+        }
+
+        function updateMBTIChart(mbtiData) {
+            const ctx = document.getElementById('mbtiChart').getContext('2d');
+            
+            // Clear existing chart if it exists
+            if (window.mbtiChart) {
+                window.mbtiChart.destroy();
+            }
+            
+            const labels = Object.keys(mbtiData);
+            const data = Object.values(mbtiData);
+            const total = data.reduce((sum, val) => sum + val, 0);
+            
+            if (total === 0) {
+                ctx.fillStyle = '#666';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No MBTI data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            window.mbtiChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#6366f1', '#8b5cf6', '#06b6d4', '#10b981',
+                            '#f59e0b', '#ef4444', '#ec4899', '#84cc16',
+                            '#f97316', '#3b82f6', '#8b5cf6', '#06b6d4',
+                            '#10b981', '#f59e0b', '#ef4444', '#ec4899'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateBrowserChart(browserData) {
+            const ctx = document.getElementById('browserChart').getContext('2d');
+            
+            // Clear existing chart if it exists
+            if (window.browserChart) {
+                window.browserChart.destroy();
+            }
+            
+            const labels = Object.keys(browserData);
+            const data = Object.values(browserData);
+            const total = data.reduce((sum, val) => sum + val, 0);
+            
+            if (total === 0) {
+                ctx.fillStyle = '#666';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('No browser data available', ctx.canvas.width / 2, ctx.canvas.height / 2);
+                return;
+            }
+            
+            window.browserChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#4285f4', '#ff9500', '#ff6b6b', '#0078d4', '#36a2eb'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const percentage = ((context.parsed / total) * 100).toFixed(1);
+                                    return `${context.label}: ${context.parsed} users (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         async function loadUsers() {
