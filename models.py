@@ -15,9 +15,12 @@ class PersonalityProfile(BaseModel):
     agreeableness: float = Field(..., ge=0.0, le=1.0)
     neuroticism: float = Field(..., ge=0.0, le=1.0)
     mbti_type: str = Field(..., example="INFP")
+    dominant_trait: str = Field(default="balanced", example="openness")
     tone_analysis: str = Field(..., example="Reflective and introspective")
     writing_style: str = Field(..., example="Analytical and thoughtful")
     summary: str = Field(..., example="A thoughtful individual with...")
+    confidence_score: int = Field(default=50, ge=0, le=100, example=86)
+    analysis_quality: str = Field(default="Medium", example="High")
 
 
 class APIResponse(BaseModel):
