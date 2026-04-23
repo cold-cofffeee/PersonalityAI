@@ -11,8 +11,8 @@ from enum import Enum
 import time
 from collections import defaultdict, deque
 
-from config import get_config
-from logging_config import get_logger
+from .config import get_config
+from .logging_config import get_logger
 
 logger = get_logger(__name__)
 config = get_config()

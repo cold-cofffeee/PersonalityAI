@@ -15,11 +15,11 @@ from datetime import datetime, timezone
 
 # Import application modules
 from main import app
-from analyzer import analyze_text, TextValidator, GeminiAPIClient, ResponseParser
-from validation import TextValidator as ValidationTextValidator, RateLimiter, ValidationLevel
-from utils import CacheLogger, utc_timestamp, utc_timestamp_str
-from config import Config
-from models import AnalyzeRequest, PersonalityProfile
+from app.analyzer import analyze_text, TextValidator, GeminiAPIClient, ResponseParser
+from app.validation import TextValidator as ValidationTextValidator, RateLimiter, ValidationLevel
+from app.utils import CacheLogger, utc_timestamp, utc_timestamp_str
+from app.config import Config
+from app.models import AnalyzeRequest, PersonalityProfile
 
 
 class TestConfig:

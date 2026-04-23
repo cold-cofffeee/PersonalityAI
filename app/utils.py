@@ -176,7 +176,7 @@ class CacheLogger:
     def get_cache_stats(self) -> Dict[str, Any]:
         """Get statistics about cached files"""
         if not os.path.exists(self.cache_dir):
-            return {"total_files": 0, "file_types": {}}
+            return {"total_files": 0, "file_types": {}, "internal_stats": self._stats}
         
         files = os.listdir(self.cache_dir)
         file_types = {}
@@ -189,7 +189,8 @@ class CacheLogger:
         return {
             "total_files": len(files),
             "file_types": file_types,
-            "cache_directory": self.cache_dir
+            "cache_directory": str(self.cache_dir),
+            "internal_stats": self._stats
         }
 
 # Global cache logger instance

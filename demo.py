@@ -9,11 +9,11 @@ import time
 from pathlib import Path
 
 # Import the enhanced modules
-from config import Config
-from logging_config import get_logger
-from validation import TextValidator, ValidationLevel, RateLimiter
-from analyzer import analyze_personality
-from utils import CacheLogger
+from app.config import Config
+from app.logging_config import get_logger
+from app.validation import TextValidator, ValidationLevel, RateLimiter
+from app.analyzer import analyze_personality
+from app.utils import CacheLogger
 
 # Initialize configuration and logging
 config = Config()
@@ -172,14 +172,14 @@ def show_project_structure():
     print("=" * 50)
     
     structure = {
-        "🐍 Core Application": ["main.py", "analyzer.py", "models.py"],
-        "🔧 Configuration": ["config.py", ".env.example"],
-        "🛡️ Security & Validation": ["validation.py"],
-        "📝 Logging & Utils": ["logging_config.py", "utils.py"],
+        "🐍 Core Application": ["app/main.py", "app/analyzer.py", "app/models.py"],
+        "🔧 Configuration": ["app/config.py", ".env.example"],
+        "🛡️ Security & Validation": ["app/validation.py"],
+        "📝 Logging & Utils": ["app/logging_config.py", "app/utils.py"],
         "🧪 Testing": ["test_suite.py"],
         "🐳 Deployment": ["Dockerfile", "docker-compose.yml", ".dockerignore"],
-        "🎨 Frontend": ["index.html"],
-        "📖 Documentation": ["README.md"]
+        "🎨 Frontend": ["templates/index.html", "templates/frontend.html", "templates/admin_panel.html"],
+        "📖 Documentation": ["README.md", "docs/DEPLOYMENT.md", "docs/SECURITY.md"]
     }
     
     for category, files in structure.items():

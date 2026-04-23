@@ -6,7 +6,7 @@ from typing import List
 import google.generativeai as genai
 from pydantic import BaseModel, Field, ValidationError
 
-from models import PersonalityProfile
+from .models import PersonalityProfile
 
 logger = logging.getLogger(__name__)
 

@@ -40,18 +40,24 @@ PersonalityAI is a sophisticated full-stack web application with a beautiful use
 
 ```
 PersonalityAI/
-├── 🐍 Backend (FastAPI)
-│   ├── main.py              # API server and endpoints
-│   ├── analyzer.py          # AI analysis engine
-│   ├── validation.py        # Input validation & security
-│   ├── config.py           # Configuration management
-│   ├── logging_config.py   # Structured logging
-│   ├── models.py           # Data models
-│   └── utils.py            # Utilities and caching
-├── 🎨 Frontend (Vanilla JS)
-│   └── index.html          # Modern SPA interface
+├── 🐍 Backend Package (FastAPI)
+│   ├── app/main.py          # API server and endpoints
+│   ├── app/analyzer.py      # AI analysis engine
+│   ├── app/validation.py    # Input validation & security
+│   ├── app/config.py        # Configuration management
+│   ├── app/logging_config.py # Structured logging
+│   ├── app/models.py        # Data models
+│   └── app/utils.py         # Utilities and caching
+├── 🎨 Templates (Vanilla JS)
+│   ├── templates/index.html
+│   ├── templates/frontend.html
+│   └── templates/admin_panel.html
 ├── 🧪 Testing
 │   └── test_suite.py       # Comprehensive test suite
+├── 📖 Documentation
+│   ├── docs/DEPLOYMENT.md
+│   ├── docs/SECURITY.md
+│   └── docs/PRODUCTION_READY.md
 ├── 🐳 Deployment
 │   ├── Dockerfile          # Container configuration
 │   ├── docker-compose.yml  # Multi-service setup
@@ -235,7 +241,7 @@ python test.py
 
 ### Advanced Configuration
 
-See `config.py` for comprehensive configuration options including:
+See `app/config.py` for comprehensive configuration options including:
 - Security settings
 - Caching policies
 - Logging levels

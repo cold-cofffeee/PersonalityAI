@@ -1,5 +1,6 @@
 import secrets
 import hashlib
+import json
 from datetime import datetime, timedelta
 from typing import Optional, Dict
 from fastapi import HTTPException, Depends, Request
@@ -28,7 +29,7 @@ class AdminAuth:
     def admin_credentials(self):
         """Lazy load admin credentials from config"""
         if self._admin_credentials is None:
-            from config import get_config
+            from .config import get_config
             config = get_config()
             self._admin_credentials = {
                 config.admin.username: config.admin.password
@@ -312,7 +313,7 @@ class AdminDataManager:
             
             # Parse browser info if available
             if "user_agents" in user_data and user_data["user_agents"]:
-                from user_tracker import UserInfoExtractor
+                from .user_tracker import UserInfoExtractor
                 # Use the first user agent for browser info
                 enhanced_data["browser_info"] = UserInfoExtractor._parse_user_agent(user_data["user_agents"][0])
             
@@ -320,5 +321,3 @@ class AdminDataManager:
             
         except Exception as e:
             return None
-
-import json
